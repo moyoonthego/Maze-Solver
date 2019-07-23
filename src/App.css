@@ -62,12 +62,24 @@ background: linear-gradient(to right, #001510, #00bf8f); /* W3C, IE 10+/ Edge, F
 
 
 
+body {
+  font-family: sans-serif;
+}
+a {
+  color: #369;
+}
+.note {
+  width: 500px;
+  margin: 50px auto;
+  font-size: 1.1em;
+  color: #333;
+  text-align: justify;
+}
 #drop-area {
   border: 2px dashed #ccc;
   border-radius: 20px;
   width: 480px;
-  font-family: sans-serif;
-  margin: 100px auto;
+  margin: 50px auto;
   padding: 20px;
 }
 #drop-area.highlight {
@@ -75,6 +87,10 @@ background: linear-gradient(to right, #001510, #00bf8f); /* W3C, IE 10+/ Edge, F
 }
 p {
   margin-top: 0;
+  color:white
+}
+b {
+  color:white
 }
 .my-form {
   margin-bottom: 10px;
@@ -101,4 +117,18 @@ p {
 }
 #fileElem {
   display: none;
+}
+
+
+#sample-file-area {
+  border: 2px dashed #ccc;
+  border-radius: 20px;
+  width: 180px;
+  margin: 50px auto;
+  padding: 20px;
+  float:right;
+  margin-right: 10px
+}
+#drop-area.highlight {
+  border-color: purple;
 }
