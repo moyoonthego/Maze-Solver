@@ -1,0 +1,20 @@
+<div>
+  <h1 text-align="center">Maze Path Solver</h1>
+  <h3>Upload a maze image below and hit the "start" button to begin processing the image. We will find the shortest path/solution to the maze.</h3>
+  <h3>Try downloading and entering a sample file to the left for an example of valid file format.</h3>
+</div>
+<div id="drop-area">
+  <form class="my-form">
+    <p >Upload a file with the file dialog or by dragging and dropping images onto the dashed region</p>
+    <input type="file" id="fileElem" multiple accept="image/*" onchange="handleFiles(this.files)"></input>
+    <label class="button" for="fileElem">Select a maze/path-tracing file</label>
+  </form>
+  <progress id="progress-bar" max='100' value='0'></progress>
+  <div id="gallery" />
+</div>
+<div id="sample-file-area">
+  <form class="my-form-2">
+    <p >Here are some sample maze files to play with...</p>
+    <b >Download these to test with them</b>
+  </form>
+</div>

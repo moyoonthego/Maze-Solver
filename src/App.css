@@ -24,7 +24,12 @@ h1 {
   color: white;
   text-align: center;
 }
-
+h5 {
+  text-align: center
+}
+h6 {
+  text-align: center
+}
 h3 {
   font-size:100%;
   color: rgba(255, 255, 255, 0.575);
@@ -52,16 +57,6 @@ background: linear-gradient(to right, #001510, #00bf8f); /* W3C, IE 10+/ Edge, F
 
 
 
-
-
-
-
-
-
-
-
-
-
 body {
   font-family: sans-serif;
 }
@@ -75,11 +70,16 @@ a {
   color: #333;
   text-align: justify;
 }
+#wrapper {
+  overflow: hidden;
+}
 #drop-area {
   border: 2px dashed #ccc;
   border-radius: 20px;
-  width: 480px;
-  margin: 50px auto;
+  width: 680px;
+  float: left;
+  margin-left: 125px;
+  margin-top: 50px;
   padding: 20px;
 }
 #drop-area.highlight {
@@ -127,7 +127,7 @@ b {
   margin: 50px auto;
   padding: 20px;
   float:right;
-  margin-right: 10px
+  margin-right: 20px
 }
 #drop-area.highlight {
   border-color: purple;
