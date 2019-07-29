@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import $ from 'jquery';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(<App />, document.getElementById('root'));
@@ -21,8 +22,10 @@ selectionbox.onchange = e => {
     }
 }
 document.getElementById('solvebutton').onclick = function() {
-    document.getElementById('solvebutton').textContent = 'Solving...'
-    uploadFile(files[0]);
+    if (files.length === 1) {
+        document.getElementById('solvebutton').textContent = 'Solving...'
+        uploadFile(files[0]);
+    }
 }
 
   // Prevent default drag behaviors
@@ -88,36 +91,35 @@ function previewFile(file) {
 }
 
 function uploadFile(file, i) {
-  /*
   var url = 'https://api.cloudinary.com/v1_1/joezimim007/image/upload'
-  var xhr = new XMLHttpRequest()
   var formData = new FormData()
-  xhr.open('POST', url, true)
-  xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
-
-  // Update progress (can be used to show progress indicator)
-  xhr.upload.addEventListener("progress", function(e) {
-  })
-
-  xhr.addEventListener('readystatechange', function(e) {
-    if (xhr.readyState === 4 && xhr.status === 200) {
-    }
-    else if (xhr.readyState === 4 && xhr.status !== 200) {
-      // Error. Inform the user
-    }
-  })
 
   formData.append('upload_preset', 'ujpu6gyk')
   formData.append('file', file)
-  xhr.send(formData)
-  */
- //var myfolder= new Folder("testing-images");
- let reader = new FileReader();
- reader.readAsDataURL(file);
- console.log(reader.readAsText);
- //reader.onload=(e)=> {
-   //  c
- //}
+
+  fetch(url, {
+    method: 'POST',
+    body: formData
+  })
+  .then(() => { /* Done. Inform the user */ })
+  .catch(() => { /* Error. Inform the user */ selectionbutton.textContent = "An error occurred"})
+  
+}
+
+function deleteFile(file, i) {
+    var url = 'https://api.cloudinary.com/v1_1/joezimim007/image/upload'
+    var formData = new FormData()
+  
+    formData.append('upload_preset', 'ujpu6gyk')
+    formData.append('file', file)
+  
+    fetch(url, {
+      method: 'DELETE',
+      body: formData
+    })
+    .then(() => { /* Done. Inform the user */ })
+    .catch(() => { /* Error. Inform the user */ selectionbutton.textContent = "An error occurred"})
+    
 }
 
 // If you want your app to work offline and load faster, you can change
