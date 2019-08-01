@@ -10,7 +10,6 @@ let selectionbox = document.getElementById('fileElem');
 let selectionbutton = document.getElementById('selectionbutton');
 
 let files = [];
-let deletecode = '';
 let total = ['dragenter', 'dragover', 'dragleave', 'drop'];
 let holdingitem = ['dragenter', 'dragover'];
 let droppeditem = ['dragleave', 'drop'];
@@ -23,8 +22,8 @@ selectionbox.onchange = e => {
     }
 }
 document.getElementById('solvebutton').onclick = function() {
-    if (files.length === 1) {
-        document.getElementById('solvebutton').textContent = 'Solving...'
+    if ((files.length === 1) && (document.getElementById('solvebutton').textContent !== 'Solved!')) {
+        document.getElementById('solvebutton').textContent = 'Solving... this may take a minute.'
         solveFile(files[0]);
     }
 }
@@ -78,7 +77,6 @@ function handleFiles(files) {
         selectionbutton.textContent = "Uploading...."
         files = [...files]
         files.forEach(previewFile)
-        files.forEach(uploadFile)
     }
 }
 
@@ -89,28 +87,48 @@ function previewFile(file) {
     let img = document.createElement('img')
     img.src = reader.result
     document.getElementById('gallery').appendChild(img)
+    selectionbutton.textContent = "Selection complete" //Done. Inform the user
   }
 }
 
 function solveFile(file, i) {
-    downloadFile(file);
-    deleteFile(file);
+    var img = new Image();
+    var canvas = document.getElementById('finalpath')
+    var ctx = canvas.getContext("2d");
+    ctx.strokeStyle = "blue";
+
+    var url = window.URL;
+    var src = url.createObjectURL(files[0]);
+    img.src = src;
+    img.addEventListener("load", function () {
+        img.width = this.width
+        img.height = this.height
+        // special!
+        if (img.height > 180) {
+            document.getElementById('drop-area').height += img.height
+        }
+        // anyways...
+        ctx.drawImage(img,0,0);
+        findPath(img, ctx);
+        downloadFile(ctx, canvas);
+    });
+
 }
 
-function downloadFile(file, i) {
-    var fr = new FileReader();
-    fr.readAsDataURL(file);
+function downloadFile(ctx, canvas, i) {
+    //var fr = new FileReader();
+    //fr.readAsDataURL(file);
 
-    var blob = new Blob([file], { type: "image/png" });
-
-    var objectURL = window.URL.createObjectURL(blob);
-    console.log(objectURL);
+    //var objectURL = window.URL.createObjectURL(file); //should be (blob)
+    //console.log(objectURL);
+    var img = new Image();
+    img.src = canvas.toDataURL();
 
     if (navigator.appVersion.toString().indexOf('.NET') > 0) {
-        window.navigator.msSaveOrOpenBlob(blob, 'image');
+        window.navigator.msSaveOrOpenBlob(img, 'image');
     } else {
         var link = document.createElement('a');
-        link.href = objectURL;
+        link.href = img.src;
         link.download = "image";
         document.body.appendChild(link);
         link.click();
@@ -118,124 +136,140 @@ function downloadFile(file, i) {
     }
 }
 
-function uploadFile(file, i) {
+// `````````````````````
+// `````````````````````
+function findPath(img, ctx)
+{
+    var imgPath = [];
+    // *********
+    // Set up required data structures
+    var pred = {}
+    pred[[0,0]] = null
+    var done = {}
+    var pr = {}
+    pr[[0,0]] = 0
+    var pq = []
+    var target = [img.width - 1, img.height - 1]
 
-  /*
-    var url = 'https://api.cloudinary.com/v1_1/maze-path-solver/image/upload'
-    var formData = new FormData();
-    formData.append('upload_preset', 'myzjrxlg')
-    formData.append('file',  file, 'image')
-    formData.append('name', 'image')
+    // Add initial spot to queue
+    push(pq, [0, 0, 0]);
+    //console.log("CURRENT PQ:"+pq);
+    // Standard Dijkstra loop
+    while (pq.length !== 0) {
+        var jxy = pop(pq);
+        //console.log("CURRENT PIXELS:"+jxy[1] +','+jxy[2])
+        // If we're done with this, skip (this lets us not
+        //   have to implement decrease_priority)
+        if ([jxy[1], jxy[2]] in done) {
+            continue
+        }
+        done[[jxy[1], jxy[2]]] = 0
 
-    fetch(url, {
-        method: 'POST',
-        body: formData
-    }).then(function(res) {
-        selectionbutton.textContent = "Selection complete" //Done. Inform the user
-        console.log(res) 
-        }).catch(() => { selectionbutton.textContent = "An error occurred:" //Error occured, notify user
-    })
-   */
-}
+        // If we reached goal, done
+        if ([jxy[1], jxy[2]] === target) {
+            break
+        }
+        var nextcheck =  [[jxy[1], jxy[2]-1], [jxy[1]+1, jxy[2]], [jxy[1], jxy[2]+1], [jxy[1]-1, jxy[2]]] 
 
-function deleteFile(file, i) {
-    var url = 'https://cloudinary.com/console/media_library/folders/all/https://res.cloudinary.com/maze-path-solver/image/upload/v1564440033/image.png'
-    var formData = new FormData();
-  
-    formData.append('upload_preset', 'myzjrxlg')
-    formData.append('file',  file, 'image')
-    formData.append('name', 'image')
-  
-    return fetch(url, {
-      method: 'DELETE',
-      body: formData
-    })
-    .then(() => { /* Done. Inform the user */ })
-    .catch(() => { /* Error. Inform the user */ document.getElementById('solvebutton').textContent = "An error occurred:"})
+        // For all possible neighbours...
+        nextcheck.forEach(function (newxy, index) {
+
+            var nbx = parseInt(newxy[0])
+            var nby = parseInt(newxy[1])
+            //console.log("CUR NEXT PIXEL:"+nbx + "," + nby);
+            //console.log('IMAGE WIDTH:'+ img.width + "," + img.height);
+            // If valid and not already expanded
+            if ((0 <= nbx) && (nbx <= (img.width - 1)) && (0 <= nby) && (nby <= (img.height - 1)) && !([nbx, nby] in done)) {
+                //console.log("VALID CUR PIXEL:"+nbx + "," + nby);
+                var colors = ctx.getImageData(nbx, nby, 1,1).data;
+                //console.log("VALID CUR PIXEL:"+nbx + "," + nby+"    COLORS:"+colors[0]+ "," +colors[1]+ "," +colors[2]);
+                // Get and update the costs as necessary
+                var d = how_white(colors) + pr[[jxy[1], jxy[2]]]
+                //console.log("COST:"+d)
+                if (!([nbx, nby] in pr) || (pr[[nbx, nby]] > d)) {
+                    pred[[nbx, nby]] = [jxy[1], jxy[2]]
+                    pr[[nbx, nby]] = d
+                    push(pq, [d, nbx, nby]);
+                }
+            }
+        });
+
+    }
+
+    // Backtrack and construct the path
+    while (Array.isArray(target)) {
+        imgPath.unshift(target);
+        target = pred[target]
+    }
+    // *********
+    //console.log("PATH IS:"+imgPath);
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    imgPath.forEach(function (item, index) { // finally, visiting every pixel in path
+        ctx.lineTo(item[0], item[1]);
+      });
+    ctx.stroke(); // print path
+    document.getElementById('solvebutton').textContent = 'Solved!'
     
 }
 
-// `````````````````````
-// `````````````````````
-function BFS(starty, startx, endy, endx)
-{
-  var queuei = [starty];
-  var queuej = [startx];
-  dic = {}
-  dic[starty.toString()+','+startx.toString()] = [{i: starty, j: startx}]
-  var imgData = ctx.getImageData(0, 0, img.width, img.height);
-  var k = (starty * img.width + startx) * 4;
-  imgData.data[k] = 255;
-  imgData.data[k+1] = 153;
-  imgData.data[k+2] = 255;
-  while (queuei.length > 0)
-  {
-      var ii = queuei.shift();
-      var jj = queuej.shift();
-      if (ii == endy && jj == endx)
-      {
-          for(var key in dic[endy.toString()+','+endx.toString()])
-          {
-             var iii = dic[endy.toString()+','+endx.toString()][key].i;
-             var jjj = dic[endy.toString()+','+endx.toString()][key].j;
-             var kp = (iii*img.width+jjj)*4;
-             imgData.data[kp] = 255;
-             imgData.data[kp+1] = 0;
-             imgData.data[kp+2] = 0;
-          }
-          ctx.putImageData(imgData, 0, 0);
-          break;
-      }
-      var k1 = ((ii - 1) * img.width + jj) * 4;
-      if (ii-1 >= 0 && imgData.data[k1] == 255 && imgData.data[k1+1] == 255 && imgData.data[k1+2] == 255)
-      {
-          imgData.data[k1] = 255;
-          imgData.data[k1+1] = 153;
-          imgData.data[k1+2] = 255;
-          queuei.push(ii-1);
-          queuej.push(jj);
-          var t = dic[ii.toString()+','+jj.toString()].slice();
-          t.push({i:ii-1, j: jj});
-          dic[(ii-1).toString()+','+jj.toString()] = t;
-      }
-      k1 = ((ii + 1) * img.width + jj) * 4;
-      if (ii+1 < img.height && imgData.data[k1] == 255 && imgData.data[k1+1] == 255 && imgData.data[k1+2] == 255)
-      {
-          imgData.data[k1] = 255;
-          imgData.data[k1+1] = 153;
-          imgData.data[k1+2] = 255;
-          queuei.push(ii+1);
-          queuej.push(jj);
-          var t = dic[ii.toString()+','+jj.toString()].slice();
-          t.push({i:ii+1, j: jj});
-          dic[(ii+1).toString()+','+jj.toString()] = t;
-      }
-      k1 = (ii * img.width + jj - 1) * 4;
-      if (jj-1 >= 0 && imgData.data[k1] == 255 && imgData.data[k1+1] == 255 && imgData.data[k1+2] == 255)
-      {
-          imgData.data[k1] = 255;
-          imgData.data[k1+1] = 153;
-          imgData.data[k1+2] = 255;
-          queuei.push(ii);
-          queuej.push(jj-1);
-          var t = dic[ii.toString()+','+jj.toString()].slice();
-          t.push({i:ii, j: jj-1});
-          dic[(ii).toString()+','+(jj-1).toString()] = t;
-      }
-      k1 = (ii * img.width + jj + 1) * 4;
-      if (jj+1 < img.width && imgData.data[k1] == 255 && imgData.data[k1+1] == 255 && imgData.data[k1+2] == 255)
-      {
-          imgData.data[k1] = 255;
-          imgData.data[k1+1] = 153;
-          imgData.data[k1+2] = 255;
-          queuei.push(ii);
-          queuej.push(jj+1);
-          var t = dic[ii.toString()+','+jj.toString()].slice();
-          t.push({i:ii, j: jj+1});
-          dic[(ii).toString()+','+(jj+1).toString()] = t;
-      }
-      ctx.putImageData(imgData, 0, 0);
-  }
+function pop(pq){
+    if (pq.length == 1) {
+        return pq.pop()
+    }
+    // Replace min with last element
+    var ret = pq[0]
+    pq[0] = pq.pop()
+
+    // Keep swapping with smallest child if any of them is smaller
+    var low = 0
+    var cur = 0
+    var l = pq.length
+    while(true) {
+
+        cur = low
+
+        var RCHILD = (cur+1) * 2
+        var LCHILD = RCHILD - 1
+
+        if (LCHILD < l && pq[LCHILD][0] < pq[low][0]) {
+            low = LCHILD
+        }
+        if (RCHILD < l && pq[RCHILD][0] < pq[low][0]) {
+            low = RCHILD
+        }
+        if (cur === low) {
+            // Standard Dijkstra loop
+            break
+        }
+
+        var temp = pq[low]
+        pq[low] = pq[cur]
+        pq[cur] = temp
+    }
+
+    return ret
+}
+function push(pq, a) {
+    // Add to the end
+    pq.push(a)
+    var cur = (pq).length - 1
+
+    // Swap with parent while smaller
+    var PARENT = (Math.floor((cur + 1) / 2)) - 1
+    while (PARENT > 0 && pq[cur][0] < pq[PARENT][0]) 
+    {
+        var temp = pq[PARENT]
+        pq[PARENT] = pq[cur]
+        pq[cur] = temp
+        cur = PARENT
+        PARENT = Math.floor((cur + 1) / 2) - 1
+    }
+}
+
+function how_white(pb) {
+    var dst = (255-pb[0])**2 + (255-pb[1])**2 + (255-pb[2])**2
+    return (((dst/100.0) ** 0.5) + 0.01)
 }
 
 // If you want your app to work offline and load faster, you can change

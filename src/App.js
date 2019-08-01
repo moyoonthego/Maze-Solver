@@ -19,7 +19,8 @@ function App() {
               <label class="button" id='selectionbutton' for="fileElem">Select a maze/path-tracing file</label>
             </form>
             <div id="gallery" />
-            <button class='button' id='solvebutton'>Solve</button>
+            <button class='button' id='solvebutton'>Solve</button> <br></br>
+            <canvas id='finalpath'></canvas>
           </div>
           <div id="sample-file-area">
             <form class="my-form-2">
