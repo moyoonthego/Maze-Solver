@@ -29,12 +29,15 @@ function App() {
               <a href="/sample-images/maze1.jpg" download>
                 <img src="/sample-images/maze1.jpg" alt="Maze1" width="104" height="104"/>
               </a>
+              <br></br>
               <a href="/sample-images/maze2.png" download>
                 <img src="/sample-images/maze2.png" alt="Maze2" width="142" height="104"/>
               </a>
+              <br></br>
               <a href="/sample-images/maze3.png" download>
                 <img src="/sample-images/maze3.png" alt="Maze3" width="104" height="142"/>
               </a>
+              <br></br>
             </form>
           </div>
         </div>

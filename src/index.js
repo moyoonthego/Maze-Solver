@@ -95,7 +95,6 @@ function solveFile(file, i) {
     var img = new Image();
     var canvas = document.getElementById('finalpath')
     var ctx = canvas.getContext("2d");
-    ctx.strokeStyle = "blue";
 
     var url = window.URL;
     var src = url.createObjectURL(files[0]);
@@ -103,11 +102,10 @@ function solveFile(file, i) {
     img.addEventListener("load", function () {
         img.width = this.width
         img.height = this.height
-        // special!
-        if (img.height > 180) {
-            document.getElementById('drop-area').height += img.height
-        }
-        // anyways...
+        canvas.width = img.width
+        canvas.height = img.height
+        ctx.strokeStyle = "red";
+
         ctx.drawImage(img,0,0);
         findPath(img, ctx);
         downloadFile(ctx, canvas);
