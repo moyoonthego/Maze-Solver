@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/mazesolver/static/css/main.f1388ab5.chunk.css",
+    "main.js": "/mazesolver/static/js/main.b699e2da.chunk.js",
+    "main.js.map": "/mazesolver/static/js/main.b699e2da.chunk.js.map",
+    "runtime~main.js": "/mazesolver/static/js/runtime~main.511876bd.js",
+    "runtime~main.js.map": "/mazesolver/static/js/runtime~main.511876bd.js.map",
+    "static/js/2.8a63cc60.chunk.js": "/mazesolver/static/js/2.8a63cc60.chunk.js",
+    "static/js/2.8a63cc60.chunk.js.map": "/mazesolver/static/js/2.8a63cc60.chunk.js.map",
+    "index.html": "/mazesolver/index.html",
+    "precache-manifest.31b8d4a68a2deb70ae7cc0d241835d8e.js": "/mazesolver/precache-manifest.31b8d4a68a2deb70ae7cc0d241835d8e.js",
+    "service-worker.js": "/mazesolver/service-worker.js",
+    "static/css/main.f1388ab5.chunk.css.map": "/mazesolver/static/css/main.f1388ab5.chunk.css.map"
+  }
+}
